@@ -8,7 +8,11 @@ import {
   DEFAULT_CATEGORY,
   type ContentInput,
   type ContentStatus,
+  type FaqItem,
 } from "@repo/types";
+
+const fieldClass =
+  "rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 import { slugify } from "@repo/utils";
 import { api } from "../lib/api";
 
@@ -26,6 +30,8 @@ export function ContentEditorPage() {
     searchParams.get("category") ?? DEFAULT_CATEGORY.slug,
   );
   const [excerpt, setExcerpt] = useState("");
+  const [summary, setSummary] = useState("");
+  const [faqs, setFaqs] = useState<FaqItem[]>([]);
   const [body, setBody] = useState<PartialBlock[]>(emptyDoc);
   const [status, setStatus] = useState<ContentStatus>("draft");
   const [saving, setSaving] = useState(false);
@@ -40,6 +46,8 @@ export function ContentEditorPage() {
       setSlug(content.slug);
       setCategorySlug(content.categorySlug);
       setExcerpt(content.excerpt);
+      setSummary(content.summary ?? "");
+      setFaqs(content.faqs);
       setBody(content.body as PartialBlock[]);
       setStatus(content.status);
       setLoaded(true);
@@ -54,6 +62,14 @@ export function ContentEditorPage() {
     return url;
   };
 
+  const addFaq = () => setFaqs((prev) => [...prev, { question: "", answer: "" }]);
+  const updateFaq = (index: number, field: keyof FaqItem, value: string) =>
+    setFaqs((prev) =>
+      prev.map((faq, i) => (i === index ? { ...faq, [field]: value } : faq)),
+    );
+  const removeFaq = (index: number) =>
+    setFaqs((prev) => prev.filter((_, i) => i !== index));
+
   const save = async (nextStatus: ContentStatus) => {
     setSaving(true);
     // Pre-render HTML now so the user web can serve it without an editor runtime.
@@ -63,6 +79,8 @@ export function ContentEditorPage() {
       slug: slug || slugify(title),
       categorySlug,
       excerpt,
+      summary,
+      faqs,
       body: body as ContentInput["body"],
       bodyHtml,
       status: nextStatus,
@@ -139,11 +157,22 @@ export function ContentEditorPage() {
           </label>
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium">요약 (검색 설명)</span>
+            <span className="text-sm font-medium">요약 (검색 설명 · meta description)</span>
             <Input
               value={excerpt}
               onChange={(event) => setExcerpt(event.target.value)}
               placeholder="검색 결과·미리보기에 노출될 요약"
+            />
+          </label>
+
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium">핵심 요약 (본문 상단 TL;DR)</span>
+            <textarea
+              value={summary}
+              onChange={(event) => setSummary(event.target.value)}
+              rows={2}
+              className={fieldClass}
+              placeholder="한두 문장으로 핵심을 먼저 제시 — AEO/스니펫·AI 답변에 유리"
             />
           </label>
         </CardContent>
@@ -157,6 +186,51 @@ export function ContentEditorPage() {
           onImageUpload={handleImageUpload}
         />
       </div>
+
+      <Card className="mt-4">
+        <CardContent className="flex flex-col gap-3 pt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-sm font-medium">자주 묻는 질문 (FAQ)</span>
+              <p className="text-xs text-muted-foreground">
+                FAQPage 구조화 데이터로 노출됩니다 — 답변 엔진·스니펫에 강력
+              </p>
+            </div>
+            <Button size="sm" variant="outline" onClick={addFaq}>
+              + 질문 추가
+            </Button>
+          </div>
+
+          {faqs.length === 0 ? (
+            <p className="text-sm text-muted-foreground">아직 추가된 FAQ가 없습니다.</p>
+          ) : (
+            faqs.map((faq, index) => (
+              <div
+                key={index}
+                className="flex flex-col gap-2 rounded-md border border-border p-3"
+              >
+                <Input
+                  value={faq.question}
+                  onChange={(event) => updateFaq(index, "question", event.target.value)}
+                  placeholder="질문"
+                />
+                <textarea
+                  value={faq.answer}
+                  onChange={(event) => updateFaq(index, "answer", event.target.value)}
+                  rows={2}
+                  className={fieldClass}
+                  placeholder="답변"
+                />
+                <div className="flex justify-end">
+                  <Button size="sm" variant="ghost" onClick={() => removeFaq(index)}>
+                    삭제
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

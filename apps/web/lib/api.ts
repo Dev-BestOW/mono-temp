@@ -45,6 +45,16 @@ export async function getAllSlugs(): Promise<string[]> {
   }
 }
 
+/** All published content summaries, for the sitemap. */
+export async function getAllPublished(): Promise<ContentSummary[]> {
+  if (!hasBackend) return sampleContent;
+  try {
+    return await api.listPublished();
+  } catch {
+    return [];
+  }
+}
+
 /** Published content for one category. */
 export async function getByCategory(
   categorySlug: string,

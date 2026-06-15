@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { CATEGORIES, getCategory } from "@repo/types";
 import { getByCategory } from "@/lib/api";
 import { ContentCard } from "@/components/content-card";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/structured-data";
+import { SITE } from "@/lib/site";
 
 export const revalidate = 60;
 
@@ -32,6 +35,12 @@ export default async function CategoryPage({ params }: PageParams) {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-12">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "홈", url: SITE.url },
+          { name: category.name, url: `${SITE.url}/category/${category.slug}` },
+        ])}
+      />
       <h1 className="text-3xl font-bold tracking-tight">{category.name}</h1>
       <p className="mt-2 text-muted-foreground">
         {category.name} 카테고리의 콘텐츠입니다.

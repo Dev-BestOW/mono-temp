@@ -3,16 +3,10 @@ import { CATEGORIES, getCategory } from "@repo/types";
 import { getLatest, getByCategory } from "@/lib/api";
 import { ContentCard } from "@/components/content-card";
 import { Section } from "@/components/section";
-import { SITE } from "@/lib/site";
+import { JsonLd } from "@/components/json-ld";
+import { websiteJsonLd, organizationJsonLd } from "@/lib/structured-data";
 
 export const revalidate = 60;
-
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: SITE.name,
-  description: SITE.description,
-};
 
 // Categories highlighted with their own row on the home page.
 const HOME_SECTIONS = CATEGORIES.slice(0, 4);
@@ -31,10 +25,8 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={websiteJsonLd()} />
+      <JsonLd data={organizationJsonLd()} />
 
       {/* Hero: one featured article + a ranked shortlist */}
       {featured ? (

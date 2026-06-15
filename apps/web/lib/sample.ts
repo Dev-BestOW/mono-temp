@@ -12,6 +12,7 @@ export const sampleContent: ContentSummary[] = CATEGORIES.flatMap((category) =>
     categorySlug: category.slug,
     title: `${category.name} 콘텐츠 예시 ${i + 1} — 알아두면 좋은 핵심 정리`,
     excerpt: `${category.name} 카테고리의 미리보기 글입니다. 백엔드 연결 전 레이아웃 확인용 더미 데이터예요.`,
+    summary: `${category.name}에 대해 꼭 알아야 할 핵심을 한눈에 정리했습니다.`,
     coverImageUrl: null,
     seoTitle: null,
     seoDescription: null,
@@ -55,9 +56,26 @@ const sampleBodyHtml = [
   "<table><tbody><tr><td>항목</td><td>설명</td></tr><tr><td>저축</td><td>안전한 자산 관리</td></tr></tbody></table>",
 ].join("");
 
-/** Build a full sample Content (with body + bodyHtml) for a given slug, or null. */
+/** Sample FAQs for previewing the FAQ section + FAQPage schema. */
+const sampleFaqs = [
+  {
+    question: "이 글은 어떤 내용을 다루나요?",
+    answer: "백엔드 연결 전 레이아웃과 구조화 데이터를 확인하기 위한 예시 글입니다.",
+  },
+  {
+    question: "실제 콘텐츠는 어떻게 채우나요?",
+    answer: "어드민 에디터로 작성해 발행하면 이 샘플 대신 실제 콘텐츠가 표시됩니다.",
+  },
+];
+
+/** Build a full sample Content for a given slug, or null. */
 export function sampleContentBySlug(slug: string): Content | null {
   const summary = sampleContent.find((item) => item.slug === slug);
   if (!summary) return null;
-  return { ...summary, body: sampleBody, bodyHtml: sampleBodyHtml };
+  return {
+    ...summary,
+    body: sampleBody,
+    bodyHtml: sampleBodyHtml,
+    faqs: sampleFaqs,
+  };
 }

@@ -33,6 +33,12 @@ export type ContentDocument = unknown[];
 
 export type ContentStatus = "draft" | "published";
 
+/** A single FAQ entry — powers the FAQPage structured data (AEO). */
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
 /** A top-level menu/category that organizes content (benchmarked from KB Think). */
 export interface Category {
   slug: string;
@@ -85,13 +91,17 @@ export interface Content {
   /** SEO overrides; fall back to title/excerpt when empty. */
   seoTitle: string | null;
   seoDescription: string | null;
+  /** Answer-first summary (TL;DR) rendered at the top — strong for AEO/snippets. */
+  summary: string | null;
+  /** Q&A for the FAQ section + FAQPage structured data (AEO). */
+  faqs: FaqItem[];
   status: ContentStatus;
   publishedAt: string | null;
   updatedAt: string;
 }
 
-/** Lightweight shape for list views (no full body or rendered HTML). */
-export type ContentSummary = Omit<Content, "body" | "bodyHtml">;
+/** Lightweight shape for list views (no full body, rendered HTML, or FAQs). */
+export type ContentSummary = Omit<Content, "body" | "bodyHtml" | "faqs">;
 
 /** Payload for creating/updating content from the admin. */
 export interface ContentInput {
@@ -105,6 +115,8 @@ export interface ContentInput {
   coverImageUrl?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
+  summary?: string | null;
+  faqs?: FaqItem[];
   status?: ContentStatus;
 }
 

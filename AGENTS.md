@@ -2,6 +2,12 @@
 
 이 모노레포에서 작업하는 에이전트가 따라야 할 규칙입니다. 코드 작성 전 이 파일을 우선 적용하세요.
 
+## ⭐ 최우선 원칙 (1순위)
+
+**유저 블로그웹(`apps/web`)의 모든 작업은 SEO/GEO/AEO 최적화가 최우선이다.**
+`apps/web`을 건드리기 전에 **반드시 [`docs/seo-geo-aeo.md`](./docs/seo-geo-aeo.md)를 읽고** 그 체크리스트를 적용한다.
+편의성·단순함·디자인이 검색/답변/생성형 엔진 노출과 충돌하면 **항상 최적화를 우선**한다.
+
 ## 프로젝트 개요
 
 Turborepo + pnpm workspaces 모노레포.
@@ -51,6 +57,20 @@ Turborepo + pnpm workspaces 모노레포.
 - 유저웹 라우트: `/`(홈: 히어로+섹션), `/category/[slug]`(메뉴별 목록, SSG), `/blog/[slug]`(상세, SSG). 공용 컴포넌트는 `apps/web/components/`(SiteHeader/SiteFooter/ContentCard/Section).
 - 백엔드 미연결 시 `apps/web/lib/sample.ts`의 더미 데이터로 레이아웃이 보인다(`hasBackend` 분기). 실데이터는 `@repo/api`.
 - 콘텐츠 조회는 `apps/web/lib/api.ts`의 `getLatest`/`getByCategory` 헬퍼 사용(샘플 폴백 포함).
+
+## SEO / AEO / GEO
+
+**정본 규칙·체크리스트: [`docs/seo-geo-aeo.md`](./docs/seo-geo-aeo.md) (1순위, `apps/web` 작업 전 필독).** 아래는 요약.
+
+유저웹은 검색·답변엔진·생성형엔진 노출에 맞춰 구성돼 있다.
+
+- **구조화 데이터**: `apps/web/lib/structured-data.ts`가 단일 소스. 블로그=`BlogPosting`+`BreadcrumbList`+(`FAQPage`), 홈=`WebSite`+`Organization`. JSON-LD는 `<JsonLd>` 컴포넌트로 주입. publisher/로고는 `lib/site.ts`(SITE) 기반, 로고는 `/icon`.
+- **사이트맵**: `app/sitemap.ts`가 홈+카테고리+전체 글 동적 생성(`getAllPublished`). 새 라우트 추가 시 여기에 반영.
+- **robots**: `app/robots.ts` — 일반 봇 + AI 크롤러(GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended 등) **전면 허용**(GEO).
+- **llms.txt**: `app/llms.txt/route.ts` — LLM용 콘텐츠 인덱스.
+- **AEO 필드**: `Content.summary`(TL;DR, 본문 상단), `Content.faqs`(FAQ 섹션+FAQPage). 어드민 에디터에서 입력.
+- 메타데이터는 `generateMetadata`(canonical/OpenGraph/article)로 페이지별 생성. 본문은 SSR HTML(pre-render)이라 크롤러·LLM이 JS 없이 읽음.
+- ⚠️ 글별 동적 OG 이미지는 미적용(한글 폰트 번들 필요). 추가하려면 한글 폰트 에셋 + `opengraph-image.tsx`.
 
 ## 작업 후 검증
 
