@@ -4,7 +4,7 @@ import { CATEGORIES, getCategory } from "@repo/types";
 import { getByCategory } from "@/lib/api";
 import { ContentCard } from "@/components/content-card";
 import { JsonLd } from "@/components/json-ld";
-import { breadcrumbJsonLd } from "@/lib/structured-data";
+import { breadcrumbJsonLd, itemListJsonLd } from "@/lib/structured-data";
 import { SITE } from "@/lib/site";
 
 export const revalidate = 60;
@@ -19,10 +19,17 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const { slug } = await params;
   const category = getCategory(slug);
   if (!category) return {};
+  const description = `${category.name} 관련 콘텐츠 모음`;
   return {
     title: category.name,
-    description: `${category.name} 관련 콘텐츠 모음`,
+    description,
     alternates: { canonical: `/category/${category.slug}` },
+    openGraph: {
+      type: "website",
+      title: category.name,
+      description,
+      url: `${SITE.url}/category/${category.slug}`,
+    },
   };
 }
 
@@ -41,6 +48,7 @@ export default async function CategoryPage({ params }: PageParams) {
           { name: category.name, url: `${SITE.url}/category/${category.slug}` },
         ])}
       />
+      {items.length > 0 ? <JsonLd data={itemListJsonLd(items)} /> : null}
       <h1 className="text-3xl font-bold tracking-tight">{category.name}</h1>
       <p className="mt-2 text-muted-foreground">
         {category.name} 카테고리의 콘텐츠입니다.

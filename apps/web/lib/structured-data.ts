@@ -46,6 +46,20 @@ export function blogPostingJsonLd(content: Content) {
   };
 }
 
+/** ItemList for a category listing — structured signal for the list page (SEO/AEO). */
+export function itemListJsonLd(items: { title: string; slug: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `${SITE.url}/blog/${item.slug}`,
+      name: item.title,
+    })),
+  };
+}
+
 export function breadcrumbJsonLd(items: { name: string; url: string }[]) {
   return {
     "@context": "https://schema.org",

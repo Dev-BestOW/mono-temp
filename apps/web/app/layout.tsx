@@ -4,16 +4,13 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SITE } from "@/lib/site";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE.url),
   title: {
     default: `${SITE.name} — 쉽게 이해하는 금융 콘텐츠`,
     template: `%s | ${SITE.name}`,
   },
   description: SITE.description,
-  keywords: ["금융", "저축", "투자", "세금", "연금", "부동산", "콘텐츠"],
   authors: [{ name: SITE.name }],
   alternates: {
     canonical: "/",
@@ -21,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    url: siteUrl,
+    url: SITE.url,
     siteName: SITE.name,
     title: `${SITE.name} — 쉽게 이해하는 금융 콘텐츠`,
     description: SITE.description,

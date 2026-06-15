@@ -6,6 +6,13 @@ import { getAllPublished } from "@/lib/api";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPublished();
 
+  // Most-recent content update — a stable freshness signal for the home entry
+  // (avoid `new Date()`, which churns on every request and misleads crawlers).
+  const latestUpdate = posts.reduce<string | undefined>(
+    (max, post) => (!max || post.updatedAt > max ? post.updatedAt : max),
+    undefined,
+  );
+
   const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${SITE.url}/blog/${post.slug}`,
     lastModified: new Date(post.updatedAt),
@@ -22,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     {
       url: SITE.url,
-      lastModified: new Date(),
+      ...(latestUpdate ? { lastModified: new Date(latestUpdate) } : {}),
       changeFrequency: "daily",
       priority: 1,
     },

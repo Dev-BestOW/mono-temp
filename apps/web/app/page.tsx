@@ -40,6 +40,10 @@ export default async function HomePage() {
                 <img
                   src={featured.coverImageUrl}
                   alt={featured.title}
+                  width={1600}
+                  height={900}
+                  fetchPriority="high"
+                  decoding="async"
                   className="h-full w-full object-cover"
                 />
               ) : null}

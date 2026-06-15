@@ -3,7 +3,17 @@ import { getCategory, type ContentSummary } from "@repo/types";
 
 function Thumbnail({ src, alt }: { src: string | null; alt: string }) {
   if (src) {
-    return <img src={src} alt={alt} className="h-full w-full object-cover" />;
+    return (
+      <img
+        src={src}
+        alt={alt}
+        width={1600}
+        height={900}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover"
+      />
+    );
   }
   return (
     <div className="h-full w-full bg-gradient-to-br from-brand-100 via-brand-200 to-brand-400" />

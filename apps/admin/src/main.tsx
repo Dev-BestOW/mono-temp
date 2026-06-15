@@ -3,9 +3,7 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { AdminLayout } from "./layouts/admin-layout";
 import { DashboardPage } from "./pages/dashboard";
-import { UsersPage } from "./pages/users";
 import { ContentListPage } from "./pages/content-list";
-import { MenusPage } from "./pages/menus";
 import "./index.css";
 
 // Lazy-load the editor page so the heavy Tiptap bundle only loads when needed.
@@ -25,8 +23,6 @@ const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { index: true, element: <DashboardPage /> },
-      { path: "users", element: <UsersPage /> },
-      { path: "menus", element: <MenusPage /> },
       { path: "contents", element: <ContentListPage /> },
       { path: "contents/new", element: editorElement },
       { path: "contents/:id/edit", element: editorElement },
