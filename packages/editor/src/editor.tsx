@@ -8,13 +8,25 @@ import {
   useCreateBlockNote,
   type DefaultReactSuggestionItem,
 } from "@blocknote/react";
-import { filterSuggestionItems } from "@blocknote/core";
+import { BlockNoteEditor, filterSuggestionItems } from "@blocknote/core";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import "./styles/content.css";
 import { schema, type AppBlock, type AppPartialBlock } from "./schema";
 
 export type EditorDocument = AppBlock[];
+
+/**
+ * Render BlockNote blocks to semantic HTML on the client (browser).
+ *
+ * Call this in the admin at save time to pre-render the body; store the result
+ * as `bodyHtml` so the user web can serve it directly without any editor
+ * runtime (which avoids BlockNote's `createContext` in React Server Components).
+ */
+export async function blocksToHTML(blocks: AppPartialBlock[]): Promise<string> {
+  const editor = BlockNoteEditor.create({ schema });
+  return editor.blocksToHTMLLossy(blocks);
+}
 
 export interface ContentEditorProps {
   /** Initial document (BlockNote blocks). */

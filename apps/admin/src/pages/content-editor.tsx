@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button, Card, CardContent, Input } from "@repo/ui";
-import { ContentEditor } from "@repo/editor/editor";
+import { ContentEditor, blocksToHTML } from "@repo/editor/editor";
 import type { PartialBlock } from "@repo/editor";
-import type { ContentInput, ContentStatus } from "@repo/types";
+import {
+  CATEGORIES,
+  DEFAULT_CATEGORY,
+  type ContentInput,
+  type ContentStatus,
+} from "@repo/types";
 import { slugify } from "@repo/utils";
 import { api } from "../lib/api";
 
@@ -12,10 +17,14 @@ const emptyDoc: PartialBlock[] = [];
 export function ContentEditorPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const isEdit = Boolean(id);
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
+  const [categorySlug, setCategorySlug] = useState(
+    searchParams.get("category") ?? DEFAULT_CATEGORY.slug,
+  );
   const [excerpt, setExcerpt] = useState("");
   const [body, setBody] = useState<PartialBlock[]>(emptyDoc);
   const [status, setStatus] = useState<ContentStatus>("draft");
@@ -29,6 +38,7 @@ export function ContentEditorPage() {
       if (!active || !content) return;
       setTitle(content.title);
       setSlug(content.slug);
+      setCategorySlug(content.categorySlug);
       setExcerpt(content.excerpt);
       setBody(content.body as PartialBlock[]);
       setStatus(content.status);
@@ -46,11 +56,15 @@ export function ContentEditorPage() {
 
   const save = async (nextStatus: ContentStatus) => {
     setSaving(true);
+    // Pre-render HTML now so the user web can serve it without an editor runtime.
+    const bodyHtml = await blocksToHTML(body);
     const payload: ContentInput = {
       title,
       slug: slug || slugify(title),
+      categorySlug,
       excerpt,
       body: body as ContentInput["body"],
+      bodyHtml,
       status: nextStatus,
     };
     try {
@@ -107,6 +121,21 @@ export function ContentEditorPage() {
               onChange={(event) => setSlug(slugify(event.target.value))}
               placeholder="my-first-post"
             />
+          </label>
+
+          <label className="flex flex-col gap-1">
+            <span className="text-sm font-medium">메뉴 (카테고리)</span>
+            <select
+              value={categorySlug}
+              onChange={(event) => setCategorySlug(event.target.value)}
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              {CATEGORIES.map((category) => (
+                <option key={category.slug} value={category.slug}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label className="flex flex-col gap-1">

@@ -10,6 +10,6 @@ export default [
     },
   },
   {
-    ignores: [".next/**", "next-env.d.ts"],
+    ignores: [".next/**", ".next-build/**", "next-env.d.ts"],
   },
 ];

@@ -8,7 +8,13 @@ import globals from "globals";
  */
 export default tseslint.config(
   {
-    ignores: ["dist/**", ".next/**", "node_modules/**", ".turbo/**"],
+    ignores: [
+      "dist/**",
+      ".next/**",
+      ".next-build/**",
+      "node_modules/**",
+      ".turbo/**",
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

@@ -1,18 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { SITE } from "@/lib/site";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "My Service — 더 나은 경험을 위한 서비스",
-    template: "%s | My Service",
+    default: `${SITE.name} — 쉽게 이해하는 금융 콘텐츠`,
+    template: `%s | ${SITE.name}`,
   },
-  description:
-    "SEO에 최적화된 Next.js 기반 유저 웹입니다. 빠르고, 접근성이 높고, 검색에 잘 노출됩니다.",
-  keywords: ["서비스", "Next.js", "디자인시스템", "모노레포"],
-  authors: [{ name: "My Service" }],
+  description: SITE.description,
+  keywords: ["금융", "저축", "투자", "세금", "연금", "부동산", "콘텐츠"],
+  authors: [{ name: SITE.name }],
   alternates: {
     canonical: "/",
   },
@@ -20,14 +22,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: siteUrl,
-    siteName: "My Service",
-    title: "My Service — 더 나은 경험을 위한 서비스",
-    description: "SEO에 최적화된 Next.js 기반 유저 웹입니다.",
+    siteName: SITE.name,
+    title: `${SITE.name} — 쉽게 이해하는 금융 콘텐츠`,
+    description: SITE.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: "My Service",
-    description: "SEO에 최적화된 Next.js 기반 유저 웹입니다.",
+    title: SITE.name,
+    description: SITE.description,
   },
   robots: {
     index: true,
@@ -55,7 +57,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <div className="flex min-h-screen flex-col">
+          <SiteHeader />
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
+        </div>
+      </body>
     </html>
   );
 }

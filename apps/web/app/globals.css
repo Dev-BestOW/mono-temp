@@ -5,7 +5,10 @@
 @source "../../../packages/ui/src/**/*.{ts,tsx}";
 
 body {
+  /* Soft lavender wash at the top, fading to the page background. */
   background-color: var(--background);
+  background-image: linear-gradient(180deg, #eef1fb 0%, var(--background) 560px);
+  background-repeat: no-repeat;
   color: var(--foreground);
   font-family: var(--font-sans-stack);
 }

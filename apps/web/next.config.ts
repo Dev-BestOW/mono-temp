@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Isolate dev and production build output dirs so running `next build` never
+  // clobbers a live `next dev` cache (which caused missing chunks → CSS/JS not
+  // loading). `next dev` → .next ; `next build`/`next start` → .next-build.
+  distDir: process.env.NODE_ENV === "production" ? ".next-build" : ".next",
   // Transpile workspace packages that ship raw TypeScript/TSX source.
   transpilePackages: [
     "@repo/ui",

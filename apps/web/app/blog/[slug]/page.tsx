@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { renderContentToHTML, type PartialBlock } from "@repo/editor";
+import { getCategory } from "@repo/types";
 import "@repo/editor/content.css";
-import { api, hasBackend } from "@/lib/api";
+import { getContentDetail, getAllSlugs } from "@/lib/api";
 
 // Incremental Static Regeneration: rebuild a page at most once per interval.
 // On publish, call on-demand revalidation from the backend for instant updates.
@@ -10,23 +11,11 @@ export const revalidate = 60;
 
 type PageParams = { params: Promise<{ slug: string }> };
 
-async function getContent(slug: string) {
-  if (!hasBackend) return null;
-  try {
-    return await api.getBySlug(slug);
-  } catch {
-    return null;
-  }
-}
+const getContent = getContentDetail;
 
 export async function generateStaticParams() {
-  if (!hasBackend) return [];
-  try {
-    const list = await api.listPublished();
-    return list.map((content) => ({ slug: content.slug }));
-  } catch {
-    return [];
-  }
+  const slugs = await getAllSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
@@ -57,8 +46,8 @@ export default async function BlogPostPage({ params }: PageParams) {
   const content = await getContent(slug);
   if (!content || content.status !== "published") notFound();
 
-  // Server-render the BlockNote document to HTML (indexable for SEO).
-  const html = await renderContentToHTML(content.body as PartialBlock[]);
+  // `bodyHtml` was pre-rendered at save time (no editor runtime on the web).
+  const html = content.bodyHtml;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -77,7 +66,15 @@ export default async function BlogPostPage({ params }: PageParams) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <article>
-        <h1 className="text-4xl font-bold tracking-tight">{content.title}</h1>
+        {getCategory(content.categorySlug) ? (
+          <Link
+            href={`/category/${content.categorySlug}`}
+            className="text-sm font-semibold text-primary hover:underline"
+          >
+            {getCategory(content.categorySlug)?.name}
+          </Link>
+        ) : null}
+        <h1 className="mt-2 text-4xl font-bold tracking-tight">{content.title}</h1>
         {content.publishedAt ? (
           <time className="mt-2 block text-sm text-muted-foreground" dateTime={content.publishedAt}>
             {new Date(content.publishedAt).toLocaleDateString("ko-KR")}

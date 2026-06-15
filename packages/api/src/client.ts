@@ -25,11 +25,11 @@ export class ApiError extends Error {
 }
 
 export interface ApiClient {
-  /** Published content for the user web (SEO pages). */
-  listPublished(): Promise<ContentSummary[]>;
+  /** Published content for the user web (SEO pages), optionally by category. */
+  listPublished(categorySlug?: string): Promise<ContentSummary[]>;
   getBySlug(slug: string): Promise<Content | null>;
-  /** Admin: full list including drafts. */
-  listAll(): Promise<ContentSummary[]>;
+  /** Admin: full list including drafts, optionally filtered by category. */
+  listAll(categorySlug?: string): Promise<ContentSummary[]>;
   getById(id: string): Promise<Content | null>;
   create(input: ContentInput): Promise<Content>;
   update(id: string, input: ContentInput): Promise<Content>;
@@ -65,10 +65,19 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
   }
 
   return {
-    listPublished: () => request<ContentSummary[]>("/contents?status=published"),
+    listPublished: (categorySlug) => {
+      const params = new URLSearchParams({ status: "published" });
+      if (categorySlug) params.set("category", categorySlug);
+      return request<ContentSummary[]>(`/contents?${params.toString()}`);
+    },
     getBySlug: (slug) =>
       request<Content | null>(`/contents/slug/${encodeURIComponent(slug)}`),
-    listAll: () => request<ContentSummary[]>("/admin/contents"),
+    listAll: (categorySlug) => {
+      const query = categorySlug
+        ? `?category=${encodeURIComponent(categorySlug)}`
+        : "";
+      return request<ContentSummary[]>(`/admin/contents${query}`);
+    },
     getById: (id) => request<Content | null>(`/admin/contents/${id}`),
     create: (input) =>
       request<Content>("/admin/contents", {

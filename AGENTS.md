@@ -35,12 +35,22 @@ Turborepo + pnpm workspaces 모노레포.
 
 - 에디터는 **BlockNote**(노션식 블록). 콘텐츠 **원본은 BlockNote 블록 JSON**(HTML 아님). 저장/전송 타입은 `@repo/types`의 `Content`/`ContentInput`, 실제 블록 타입은 `@repo/editor`의 `PartialBlock`.
 - 편집·렌더는 **동일 에디터(@repo/editor)** 사용. 커스텀 블록 추가 시 에디터/서버 렌더 스키마를 함께 맞춘다.
-- 유저웹은 `renderContentToHTML()`(`blocksToHTMLLossy`)로 **서버 렌더(SSG/ISR)** → 시맨틱 HTML, SEO. 클라이언트에서 에디터를 띄우지 않는다. 렌더 모듈은 **동적 import** 유지.
-- 유저웹은 렌더 결과를 `@repo/editor/content.css`로 스타일링, `next.config.ts`에 `serverExternalPackages`(blocknote core/react/server-util) 유지.
+- **HTML은 저장 시점에 미리 렌더**한다: 어드민이 저장할 때 클라이언트에서 `blocksToHTML(blocks)`(`@repo/editor/editor`)로 변환해 `Content.bodyHtml`에 저장. 유저웹은 이 `bodyHtml`을 `dangerouslySetInnerHTML`로 그대로 출력하고 `@repo/editor/content.css`로 스타일링한다.
+- ⚠️ **유저웹(RSC)에서 BlockNote로 read-time 서버 렌더를 하지 말 것** — `@blocknote/react`가 `createContext`를 써서 서버 컴포넌트에서 터진다. 그래서 pre-render(저장 시) 방식을 쓴다. `body`(JSON)는 재편집용으로 함께 저장.
 - 커스텀 블록은 `@repo/editor/src/blocks/`에 `createReactBlockSpec`(반환 팩토리를 `schema.ts`에서 `()`로 호출)로 정의하고 `render`+`toExternalHTML` 둘 다 구현. 슬래시 메뉴 등록·`content.css` 스타일까지 함께. 표는 기본 제공. 절차는 docs 참고.
 - 백엔드 통신은 **`@repo/api`** 클라이언트만 사용(앱에서 직접 fetch 금지).
 - 이미지는 `onImageUpload`로 백엔드 업로드 후 **URL만 저장**(base64 금지).
 - 에디터 의존 페이지는 `React.lazy`로 코드 스플리팅 유지.
+
+## 메뉴/카테고리 & 유저웹 구조
+
+유저웹은 KB Think(kbthink.com) 레이아웃을 벤치마크한 콘텐츠 사이트다.
+
+- **메뉴(카테고리)** 는 `@repo/types`의 `CATEGORIES` 단일 소스. 유저웹 nav/footer와 어드민 카테고리 선택이 모두 여기서 읽는다. 메뉴 추가/이름변경은 이 배열만 수정.
+- 콘텐츠는 `Content.categorySlug`로 메뉴에 속한다. 어드민 에디터에 카테고리 선택, 콘텐츠 목록은 `?category=`로 필터, `메뉴` 페이지에서 메뉴별 콘텐츠 관리.
+- 유저웹 라우트: `/`(홈: 히어로+섹션), `/category/[slug]`(메뉴별 목록, SSG), `/blog/[slug]`(상세, SSG). 공용 컴포넌트는 `apps/web/components/`(SiteHeader/SiteFooter/ContentCard/Section).
+- 백엔드 미연결 시 `apps/web/lib/sample.ts`의 더미 데이터로 레이아웃이 보인다(`hasBackend` 분기). 실데이터는 `@repo/api`.
+- 콘텐츠 조회는 `apps/web/lib/api.ts`의 `getLatest`/`getByCategory` 헬퍼 사용(샘플 폴백 포함).
 
 ## 작업 후 검증
 
