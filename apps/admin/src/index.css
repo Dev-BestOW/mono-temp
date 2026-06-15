@@ -1,0 +1,12 @@
+@import "tailwindcss";
+@import "../../../packages/ui/src/styles/theme.css";
+
+/* Scan the design system source so its utility classes are generated here. */
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
+
+body {
+  margin: 0;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans-stack);
+}
