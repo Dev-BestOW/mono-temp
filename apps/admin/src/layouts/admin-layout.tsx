@@ -3,6 +3,7 @@ import { cn } from "@repo/ui";
 
 const navItems = [
   { to: "/", label: "대시보드", end: true },
+  { to: "/contents", label: "콘텐츠", end: false },
   { to: "/users", label: "사용자", end: false },
 ];
 

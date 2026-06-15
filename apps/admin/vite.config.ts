@@ -10,6 +10,6 @@ export default defineConfig({
   // Workspace UI package ships raw TSX — let Vite transpile it instead of
   // pre-bundling it as an external dependency.
   optimizeDeps: {
-    exclude: ["@repo/ui", "@repo/utils", "@repo/types"],
+    exclude: ["@repo/ui", "@repo/utils", "@repo/types", "@repo/editor", "@repo/api"],
   },
 });
