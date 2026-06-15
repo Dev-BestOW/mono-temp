@@ -33,11 +33,18 @@ pnpm typecheck    # 전체 타입 체크
 pnpm lint         # 전체 린트
 ```
 
-개별 앱만 실행하려면:
+## 개별 실행
 
 ```bash
 pnpm --filter web dev
 pnpm --filter admin dev
+```
+
+## 개별 빌드
+
+```bash
+pnpm --filter web build      # 유저웹만
+pnpm --filter admin build    # 어드민만
 ```
 
 ## 디자인시스템
