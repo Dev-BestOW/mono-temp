@@ -56,3 +56,8 @@ pnpm --filter admin build    # 어드민만
 - 컴포넌트는 `@repo/ui`에서 그대로 import 합니다: `import { Button, Card } from "@repo/ui"`.
 
 다크 모드는 `<html class="dark">` 토글로 활성화됩니다.
+
+### UI 컴포넌트 관리 컨벤션
+
+공유 UI(`@repo/ui`)와 앱 전용 UI를 어디에 두고 언제 승격할지에 대한 규칙은
+[`docs/ui-conventions.md`](./docs/ui-conventions.md)를 참고하세요.
