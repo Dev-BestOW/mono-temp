@@ -121,3 +121,4 @@ curl localhost:3000/llms.txt      # 콘텐츠 인덱스 확인
 - 본문 실제 이미지의 `next/image` 적용(LCP)
 - 관련 글/시리즈 내부 링크 강화
 - IndexNow·사이트맵 핑 자동화
+- **검색 성과 분석 연동**(GSC·GA4·네이버 서치어드바이저) — 설계: [`search-analytics-integration.md`](./search-analytics-integration.md). 도메인 확정·배포 후 활성화
